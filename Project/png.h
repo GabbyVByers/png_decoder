@@ -3,8 +3,8 @@
  *   Header [png.h]
  */
 
-#ifndef PNG_HEADER_GUARD
-#define PNG_HEADER_GUARD
+#ifndef PNG_DECODER_ENCODER_HEADER_GUARD
+#define PNG_DECODER_ENCODER_HEADER_GUARD
 
 /***************** Light-Weight Zero-Dependency PNG Decoder & Encoder (C99) *****************
  * 
@@ -28,5 +28,5 @@ int png_decode(const char* path, uint32_t** pixels, uint32_t* width, uint32_t* h
 int png_encode(const char* path, uint32_t* pixels, uint32_t width, uint32_t height);
 const char* png_error(int retcode);
 
-#endif /* PNG_HEADER_GUARD */
+#endif /* PNG_DECODER_ENCODER_HEADER_GUARD */
 
