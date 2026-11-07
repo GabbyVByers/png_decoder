@@ -1,0 +1,598 @@
+
+/*
+ *   Header File [rose.h]
+ */
+
+#ifndef ROSE_ROSE_HEADER_GUARD
+#define ROSE_ROSE_HEADER_GUARD
+
+#if defined(NDEBUG)
+#define ROSE_RELEASE
+#else
+#define ROSE_DEBUG
+#endif
+
+#if defined(__SANITIZE_ADDRESS__)
+#pragma message("ASan ENABLED")
+#else
+#pragma message("ASan DISABLED")
+#endif
+
+#if !defined(__SANITIZE_ADDRESS__) && defined(ROSE_DEBUG)
+#define ROSE_CRTDBG
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+#endif
+
+#pragma warning (push, 0)
+#include "SDL3/SDL.h"
+#include "stb_image.h"
+#include "stb_image_write.h"
+#pragma warning (pop)
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <float.h>
+#include <assert.h>
+
+#if !defined(ROSE_PANIC)
+#if defined(ROSE_RELEASE)
+#define rose_panic_abort exit(EXIT_FAILURE)
+#else
+#define rose_panic_abort abort()
+#endif
+#define ROSE_PANIC(...)                                     \
+do {                                                        \
+	const char *rose___file = strrchr(__FILE__, '\\');      \
+	rose___file = rose___file ? rose___file + 1 : __FILE__; \
+	fprintf(stderr, "> PANIC!!!\n");                        \
+	fprintf(stderr, "> FILE: [%s]\n", rose___file);         \
+	fprintf(stderr, "> LINE: [%d]\n", __LINE__);            \
+	fprintf(stderr, "> ERROR: '");                          \
+	fprintf(stderr, __VA_ARGS__);                           \
+	fprintf(stderr, "'\n");                                 \
+	rose_panic_abort;                                       \
+} while (0)
+#endif
+
+#define ROSE_BUTTON_LEFT   SDL_BUTTON_LEFT
+#define ROSE_BUTTON_MIDDLE SDL_BUTTON_MIDDLE
+#define ROSE_BUTTON_RIGHT  SDL_BUTTON_RIGHT
+#define ROSE_BUTTON_X1     SDL_BUTTON_X1
+#define ROSE_BUTTON_X2     SDL_BUTTON_X2
+
+typedef enum ROSE_Scancode {
+	ROSE_SCANCODE_UNKNOWN = SDL_SCANCODE_UNKNOWN,
+	ROSE_SCANCODE_A = SDL_SCANCODE_A,
+	ROSE_SCANCODE_B = SDL_SCANCODE_B,
+	ROSE_SCANCODE_C = SDL_SCANCODE_C,
+	ROSE_SCANCODE_D = SDL_SCANCODE_D,
+	ROSE_SCANCODE_E = SDL_SCANCODE_E,
+	ROSE_SCANCODE_F = SDL_SCANCODE_F,
+	ROSE_SCANCODE_G = SDL_SCANCODE_G,
+	ROSE_SCANCODE_H = SDL_SCANCODE_H,
+	ROSE_SCANCODE_I = SDL_SCANCODE_I,
+	ROSE_SCANCODE_J = SDL_SCANCODE_J,
+	ROSE_SCANCODE_K = SDL_SCANCODE_K,
+	ROSE_SCANCODE_L = SDL_SCANCODE_L,
+	ROSE_SCANCODE_M = SDL_SCANCODE_M,
+	ROSE_SCANCODE_N = SDL_SCANCODE_N,
+	ROSE_SCANCODE_O = SDL_SCANCODE_O,
+	ROSE_SCANCODE_P = SDL_SCANCODE_P,
+	ROSE_SCANCODE_Q = SDL_SCANCODE_Q,
+	ROSE_SCANCODE_R = SDL_SCANCODE_R,
+	ROSE_SCANCODE_S = SDL_SCANCODE_S,
+	ROSE_SCANCODE_T = SDL_SCANCODE_T,
+	ROSE_SCANCODE_U = SDL_SCANCODE_U,
+	ROSE_SCANCODE_V = SDL_SCANCODE_V,
+	ROSE_SCANCODE_W = SDL_SCANCODE_W,
+	ROSE_SCANCODE_X = SDL_SCANCODE_X,
+	ROSE_SCANCODE_Y = SDL_SCANCODE_Y,
+	ROSE_SCANCODE_Z = SDL_SCANCODE_Z,
+	ROSE_SCANCODE_1 = SDL_SCANCODE_1,
+	ROSE_SCANCODE_2 = SDL_SCANCODE_2,
+	ROSE_SCANCODE_3 = SDL_SCANCODE_3,
+	ROSE_SCANCODE_4 = SDL_SCANCODE_4,
+	ROSE_SCANCODE_5 = SDL_SCANCODE_5,
+	ROSE_SCANCODE_6 = SDL_SCANCODE_6,
+	ROSE_SCANCODE_7 = SDL_SCANCODE_7,
+	ROSE_SCANCODE_8 = SDL_SCANCODE_8,
+	ROSE_SCANCODE_9 = SDL_SCANCODE_9,
+	ROSE_SCANCODE_0 = SDL_SCANCODE_0,
+	ROSE_SCANCODE_RETURN = SDL_SCANCODE_RETURN,
+	ROSE_SCANCODE_ESCAPE = SDL_SCANCODE_ESCAPE,
+	ROSE_SCANCODE_BACKSPACE = SDL_SCANCODE_BACKSPACE,
+	ROSE_SCANCODE_TAB = SDL_SCANCODE_TAB,
+	ROSE_SCANCODE_SPACE = SDL_SCANCODE_SPACE,
+	ROSE_SCANCODE_MINUS = SDL_SCANCODE_MINUS,
+	ROSE_SCANCODE_EQUALS = SDL_SCANCODE_EQUALS,
+	ROSE_SCANCODE_LEFTBRACKET = SDL_SCANCODE_LEFTBRACKET,
+	ROSE_SCANCODE_RIGHTBRACKET = SDL_SCANCODE_RIGHTBRACKET,
+	ROSE_SCANCODE_BACKSLASH = SDL_SCANCODE_BACKSLASH,
+	ROSE_SCANCODE_NONUSHASH = SDL_SCANCODE_NONUSHASH,
+	ROSE_SCANCODE_SEMICOLON = SDL_SCANCODE_SEMICOLON,
+	ROSE_SCANCODE_APOSTROPHE = SDL_SCANCODE_APOSTROPHE,
+	ROSE_SCANCODE_GRAVE = SDL_SCANCODE_GRAVE,
+	ROSE_SCANCODE_COMMA = SDL_SCANCODE_COMMA,
+	ROSE_SCANCODE_PERIOD = SDL_SCANCODE_PERIOD,
+	ROSE_SCANCODE_SLASH = SDL_SCANCODE_SLASH,
+	ROSE_SCANCODE_CAPSLOCK = SDL_SCANCODE_CAPSLOCK,
+	ROSE_SCANCODE_F1 = SDL_SCANCODE_F1,
+	ROSE_SCANCODE_F2 = SDL_SCANCODE_F2,
+	ROSE_SCANCODE_F3 = SDL_SCANCODE_F3,
+	ROSE_SCANCODE_F4 = SDL_SCANCODE_F4,
+	ROSE_SCANCODE_F5 = SDL_SCANCODE_F5,
+	ROSE_SCANCODE_F6 = SDL_SCANCODE_F6,
+	ROSE_SCANCODE_F7 = SDL_SCANCODE_F7,
+	ROSE_SCANCODE_F8 = SDL_SCANCODE_F8,
+	ROSE_SCANCODE_F9 = SDL_SCANCODE_F9,
+	ROSE_SCANCODE_F10 = SDL_SCANCODE_F10,
+	ROSE_SCANCODE_F11 = SDL_SCANCODE_F11,
+	ROSE_SCANCODE_F12 = SDL_SCANCODE_F12,
+	ROSE_SCANCODE_PRINTSCREEN = SDL_SCANCODE_PRINTSCREEN,
+	ROSE_SCANCODE_SCROLLLOCK = SDL_SCANCODE_SCROLLLOCK,
+	ROSE_SCANCODE_PAUSE = SDL_SCANCODE_PAUSE,
+	ROSE_SCANCODE_INSERT = SDL_SCANCODE_INSERT,
+	ROSE_SCANCODE_HOME = SDL_SCANCODE_HOME,
+	ROSE_SCANCODE_PAGEUP = SDL_SCANCODE_PAGEUP,
+	ROSE_SCANCODE_DELETE = SDL_SCANCODE_DELETE,
+	ROSE_SCANCODE_END = SDL_SCANCODE_END,
+	ROSE_SCANCODE_PAGEDOWN = SDL_SCANCODE_PAGEDOWN,
+	ROSE_SCANCODE_RIGHT = SDL_SCANCODE_RIGHT,
+	ROSE_SCANCODE_LEFT = SDL_SCANCODE_LEFT,
+	ROSE_SCANCODE_DOWN = SDL_SCANCODE_DOWN,
+	ROSE_SCANCODE_UP = SDL_SCANCODE_UP,
+	ROSE_SCANCODE_NUMLOCKCLEAR = SDL_SCANCODE_NUMLOCKCLEAR,
+	ROSE_SCANCODE_KP_DIVIDE = SDL_SCANCODE_KP_DIVIDE,
+	ROSE_SCANCODE_KP_MULTIPLY = SDL_SCANCODE_KP_MULTIPLY,
+	ROSE_SCANCODE_KP_MINUS = SDL_SCANCODE_KP_MINUS,
+	ROSE_SCANCODE_KP_PLUS = SDL_SCANCODE_KP_PLUS,
+	ROSE_SCANCODE_KP_ENTER = SDL_SCANCODE_KP_ENTER,
+	ROSE_SCANCODE_KP_1 = SDL_SCANCODE_KP_1,
+	ROSE_SCANCODE_KP_2 = SDL_SCANCODE_KP_2,
+	ROSE_SCANCODE_KP_3 = SDL_SCANCODE_KP_3,
+	ROSE_SCANCODE_KP_4 = SDL_SCANCODE_KP_4,
+	ROSE_SCANCODE_KP_5 = SDL_SCANCODE_KP_5,
+	ROSE_SCANCODE_KP_6 = SDL_SCANCODE_KP_6,
+	ROSE_SCANCODE_KP_7 = SDL_SCANCODE_KP_7,
+	ROSE_SCANCODE_KP_8 = SDL_SCANCODE_KP_8,
+	ROSE_SCANCODE_KP_9 = SDL_SCANCODE_KP_9,
+	ROSE_SCANCODE_KP_0 = SDL_SCANCODE_KP_0,
+	ROSE_SCANCODE_KP_PERIOD = SDL_SCANCODE_KP_PERIOD,
+	ROSE_SCANCODE_NONUSBACKSLASH = SDL_SCANCODE_NONUSBACKSLASH,
+	ROSE_SCANCODE_APPLICATION = SDL_SCANCODE_APPLICATION,
+	ROSE_SCANCODE_POWER = SDL_SCANCODE_POWER,
+	ROSE_SCANCODE_KP_EQUALS = SDL_SCANCODE_KP_EQUALS,
+	ROSE_SCANCODE_F13 = SDL_SCANCODE_F13,
+	ROSE_SCANCODE_F14 = SDL_SCANCODE_F14,
+	ROSE_SCANCODE_F15 = SDL_SCANCODE_F15,
+	ROSE_SCANCODE_F16 = SDL_SCANCODE_F16,
+	ROSE_SCANCODE_F17 = SDL_SCANCODE_F17,
+	ROSE_SCANCODE_F18 = SDL_SCANCODE_F18,
+	ROSE_SCANCODE_F19 = SDL_SCANCODE_F19,
+	ROSE_SCANCODE_F20 = SDL_SCANCODE_F20,
+	ROSE_SCANCODE_F21 = SDL_SCANCODE_F21,
+	ROSE_SCANCODE_F22 = SDL_SCANCODE_F22,
+	ROSE_SCANCODE_F23 = SDL_SCANCODE_F23,
+	ROSE_SCANCODE_F24 = SDL_SCANCODE_F24,
+	ROSE_SCANCODE_EXECUTE = SDL_SCANCODE_EXECUTE,
+	ROSE_SCANCODE_HELP = SDL_SCANCODE_HELP,
+	ROSE_SCANCODE_MENU = SDL_SCANCODE_MENU,
+	ROSE_SCANCODE_SELECT = SDL_SCANCODE_SELECT,
+	ROSE_SCANCODE_STOP = SDL_SCANCODE_STOP,
+	ROSE_SCANCODE_AGAIN = SDL_SCANCODE_AGAIN,
+	ROSE_SCANCODE_UNDO = SDL_SCANCODE_UNDO,
+	ROSE_SCANCODE_CUT = SDL_SCANCODE_CUT,
+	ROSE_SCANCODE_COPY = SDL_SCANCODE_COPY,
+	ROSE_SCANCODE_PASTE = SDL_SCANCODE_PASTE,
+	ROSE_SCANCODE_FIND = SDL_SCANCODE_FIND,
+	ROSE_SCANCODE_MUTE = SDL_SCANCODE_MUTE,
+	ROSE_SCANCODE_VOLUMEUP = SDL_SCANCODE_VOLUMEUP,
+	ROSE_SCANCODE_VOLUMEDOWN = SDL_SCANCODE_VOLUMEDOWN,
+	ROSE_SCANCODE_KP_COMMA = SDL_SCANCODE_KP_COMMA,
+	ROSE_SCANCODE_KP_EQUALSAS400 = SDL_SCANCODE_KP_EQUALSAS400,
+	ROSE_SCANCODE_INTERNATIONAL1 = SDL_SCANCODE_INTERNATIONAL1,
+	ROSE_SCANCODE_INTERNATIONAL2 = SDL_SCANCODE_INTERNATIONAL2,
+	ROSE_SCANCODE_INTERNATIONAL3 = SDL_SCANCODE_INTERNATIONAL3,
+	ROSE_SCANCODE_INTERNATIONAL4 = SDL_SCANCODE_INTERNATIONAL4,
+	ROSE_SCANCODE_INTERNATIONAL5 = SDL_SCANCODE_INTERNATIONAL5,
+	ROSE_SCANCODE_INTERNATIONAL6 = SDL_SCANCODE_INTERNATIONAL6,
+	ROSE_SCANCODE_INTERNATIONAL7 = SDL_SCANCODE_INTERNATIONAL7,
+	ROSE_SCANCODE_INTERNATIONAL8 = SDL_SCANCODE_INTERNATIONAL8,
+	ROSE_SCANCODE_INTERNATIONAL9 = SDL_SCANCODE_INTERNATIONAL9,
+	ROSE_SCANCODE_LANG1 = SDL_SCANCODE_LANG1,
+	ROSE_SCANCODE_LANG2 = SDL_SCANCODE_LANG2,
+	ROSE_SCANCODE_LANG3 = SDL_SCANCODE_LANG3,
+	ROSE_SCANCODE_LANG4 = SDL_SCANCODE_LANG4,
+	ROSE_SCANCODE_LANG5 = SDL_SCANCODE_LANG5,
+	ROSE_SCANCODE_LANG6 = SDL_SCANCODE_LANG6,
+	ROSE_SCANCODE_LANG7 = SDL_SCANCODE_LANG7,
+	ROSE_SCANCODE_LANG8 = SDL_SCANCODE_LANG8,
+	ROSE_SCANCODE_LANG9 = SDL_SCANCODE_LANG9,
+	ROSE_SCANCODE_ALTERASE = SDL_SCANCODE_ALTERASE,
+	ROSE_SCANCODE_SYSREQ = SDL_SCANCODE_SYSREQ,
+	ROSE_SCANCODE_CANCEL = SDL_SCANCODE_CANCEL,
+	ROSE_SCANCODE_CLEAR = SDL_SCANCODE_CLEAR,
+	ROSE_SCANCODE_PRIOR = SDL_SCANCODE_PRIOR,
+	ROSE_SCANCODE_RETURN2 = SDL_SCANCODE_RETURN2,
+	ROSE_SCANCODE_SEPARATOR = SDL_SCANCODE_SEPARATOR,
+	ROSE_SCANCODE_OUT = SDL_SCANCODE_OUT,
+	ROSE_SCANCODE_OPER = SDL_SCANCODE_OPER,
+	ROSE_SCANCODE_CLEARAGAIN = SDL_SCANCODE_CLEARAGAIN,
+	ROSE_SCANCODE_CRSEL = SDL_SCANCODE_CRSEL,
+	ROSE_SCANCODE_EXSEL = SDL_SCANCODE_EXSEL,
+	ROSE_SCANCODE_KP_00 = SDL_SCANCODE_KP_00,
+	ROSE_SCANCODE_KP_000 = SDL_SCANCODE_KP_000,
+	ROSE_SCANCODE_THOUSANDSSEPARATOR = SDL_SCANCODE_THOUSANDSSEPARATOR,
+	ROSE_SCANCODE_DECIMALSEPARATOR = SDL_SCANCODE_DECIMALSEPARATOR,
+	ROSE_SCANCODE_CURRENCYUNIT = SDL_SCANCODE_CURRENCYUNIT,
+	ROSE_SCANCODE_CURRENCYSUBUNIT = SDL_SCANCODE_CURRENCYSUBUNIT,
+	ROSE_SCANCODE_KP_LEFTPAREN = SDL_SCANCODE_KP_LEFTPAREN,
+	ROSE_SCANCODE_KP_RIGHTPAREN = SDL_SCANCODE_KP_RIGHTPAREN,
+	ROSE_SCANCODE_KP_LEFTBRACE = SDL_SCANCODE_KP_LEFTBRACE,
+	ROSE_SCANCODE_KP_RIGHTBRACE = SDL_SCANCODE_KP_RIGHTBRACE,
+	ROSE_SCANCODE_KP_TAB = SDL_SCANCODE_KP_TAB,
+	ROSE_SCANCODE_KP_BACKSPACE = SDL_SCANCODE_KP_BACKSPACE,
+	ROSE_SCANCODE_KP_A = SDL_SCANCODE_KP_A,
+	ROSE_SCANCODE_KP_B = SDL_SCANCODE_KP_B,
+	ROSE_SCANCODE_KP_C = SDL_SCANCODE_KP_C,
+	ROSE_SCANCODE_KP_D = SDL_SCANCODE_KP_D,
+	ROSE_SCANCODE_KP_E = SDL_SCANCODE_KP_E,
+	ROSE_SCANCODE_KP_F = SDL_SCANCODE_KP_F,
+	ROSE_SCANCODE_KP_XOR = SDL_SCANCODE_KP_XOR,
+	ROSE_SCANCODE_KP_POWER = SDL_SCANCODE_KP_POWER,
+	ROSE_SCANCODE_KP_PERCENT = SDL_SCANCODE_KP_PERCENT,
+	ROSE_SCANCODE_KP_LESS = SDL_SCANCODE_KP_LESS,
+	ROSE_SCANCODE_KP_GREATER = SDL_SCANCODE_KP_GREATER,
+	ROSE_SCANCODE_KP_AMPERSAND = SDL_SCANCODE_KP_AMPERSAND,
+	ROSE_SCANCODE_KP_DBLAMPERSAND = SDL_SCANCODE_KP_DBLAMPERSAND,
+	ROSE_SCANCODE_KP_VERTICALBAR = SDL_SCANCODE_KP_VERTICALBAR,
+	ROSE_SCANCODE_KP_DBLVERTICALBAR = SDL_SCANCODE_KP_DBLVERTICALBAR,
+	ROSE_SCANCODE_KP_COLON = SDL_SCANCODE_KP_COLON,
+	ROSE_SCANCODE_KP_HASH = SDL_SCANCODE_KP_HASH,
+	ROSE_SCANCODE_KP_SPACE = SDL_SCANCODE_KP_SPACE,
+	ROSE_SCANCODE_KP_AT = SDL_SCANCODE_KP_AT,
+	ROSE_SCANCODE_KP_EXCLAM = SDL_SCANCODE_KP_EXCLAM,
+	ROSE_SCANCODE_KP_MEMSTORE = SDL_SCANCODE_KP_MEMSTORE,
+	ROSE_SCANCODE_KP_MEMRECALL = SDL_SCANCODE_KP_MEMRECALL,
+	ROSE_SCANCODE_KP_MEMCLEAR = SDL_SCANCODE_KP_MEMCLEAR,
+	ROSE_SCANCODE_KP_MEMADD = SDL_SCANCODE_KP_MEMADD,
+	ROSE_SCANCODE_KP_MEMSUBTRACT = SDL_SCANCODE_KP_MEMSUBTRACT,
+	ROSE_SCANCODE_KP_MEMMULTIPLY = SDL_SCANCODE_KP_MEMMULTIPLY,
+	ROSE_SCANCODE_KP_MEMDIVIDE = SDL_SCANCODE_KP_MEMDIVIDE,
+	ROSE_SCANCODE_KP_PLUSMINUS = SDL_SCANCODE_KP_PLUSMINUS,
+	ROSE_SCANCODE_KP_CLEAR = SDL_SCANCODE_KP_CLEAR,
+	ROSE_SCANCODE_KP_CLEARENTRY = SDL_SCANCODE_KP_CLEARENTRY,
+	ROSE_SCANCODE_KP_BINARY = SDL_SCANCODE_KP_BINARY,
+	ROSE_SCANCODE_KP_OCTAL = SDL_SCANCODE_KP_OCTAL,
+	ROSE_SCANCODE_KP_DECIMAL = SDL_SCANCODE_KP_DECIMAL,
+	ROSE_SCANCODE_KP_HEXADECIMAL = SDL_SCANCODE_KP_HEXADECIMAL,
+	ROSE_SCANCODE_LCTRL = SDL_SCANCODE_LCTRL,
+	ROSE_SCANCODE_LSHIFT = SDL_SCANCODE_LSHIFT,
+	ROSE_SCANCODE_LALT = SDL_SCANCODE_LALT,
+	ROSE_SCANCODE_LGUI = SDL_SCANCODE_LGUI,
+	ROSE_SCANCODE_RCTRL = SDL_SCANCODE_RCTRL,
+	ROSE_SCANCODE_RSHIFT = SDL_SCANCODE_RSHIFT,
+	ROSE_SCANCODE_RALT = SDL_SCANCODE_RALT,
+	ROSE_SCANCODE_RGUI = SDL_SCANCODE_RGUI,
+	ROSE_SCANCODE_MODE = SDL_SCANCODE_MODE,
+	ROSE_SCANCODE_SLEEP = SDL_SCANCODE_SLEEP,
+	ROSE_SCANCODE_WAKE = SDL_SCANCODE_WAKE,
+	ROSE_SCANCODE_CHANNEL_INCREMENT = SDL_SCANCODE_CHANNEL_INCREMENT,
+	ROSE_SCANCODE_CHANNEL_DECREMENT = SDL_SCANCODE_CHANNEL_DECREMENT,
+	ROSE_SCANCODE_MEDIA_PLAY = SDL_SCANCODE_MEDIA_PLAY,
+	ROSE_SCANCODE_MEDIA_PAUSE = SDL_SCANCODE_MEDIA_PAUSE,
+	ROSE_SCANCODE_MEDIA_RECORD = SDL_SCANCODE_MEDIA_RECORD,
+	ROSE_SCANCODE_MEDIA_FAST_FORWARD = SDL_SCANCODE_MEDIA_FAST_FORWARD,
+	ROSE_SCANCODE_MEDIA_REWIND = SDL_SCANCODE_MEDIA_REWIND,
+	ROSE_SCANCODE_MEDIA_NEXT_TRACK = SDL_SCANCODE_MEDIA_NEXT_TRACK,
+	ROSE_SCANCODE_MEDIA_PREVIOUS_TRACK = SDL_SCANCODE_MEDIA_PREVIOUS_TRACK,
+	ROSE_SCANCODE_MEDIA_STOP = SDL_SCANCODE_MEDIA_STOP,
+	ROSE_SCANCODE_MEDIA_EJECT = SDL_SCANCODE_MEDIA_EJECT,
+	ROSE_SCANCODE_MEDIA_PLAY_PAUSE = SDL_SCANCODE_MEDIA_PLAY_PAUSE,
+	ROSE_SCANCODE_MEDIA_SELECT = SDL_SCANCODE_MEDIA_SELECT,
+	ROSE_SCANCODE_AC_NEW = SDL_SCANCODE_AC_NEW,
+	ROSE_SCANCODE_AC_OPEN = SDL_SCANCODE_AC_OPEN,
+	ROSE_SCANCODE_AC_CLOSE = SDL_SCANCODE_AC_CLOSE,
+	ROSE_SCANCODE_AC_EXIT = SDL_SCANCODE_AC_EXIT,
+	ROSE_SCANCODE_AC_SAVE = SDL_SCANCODE_AC_SAVE,
+	ROSE_SCANCODE_AC_PRINT = SDL_SCANCODE_AC_PRINT,
+	ROSE_SCANCODE_AC_PROPERTIES = SDL_SCANCODE_AC_PROPERTIES,
+	ROSE_SCANCODE_AC_SEARCH = SDL_SCANCODE_AC_SEARCH,
+	ROSE_SCANCODE_AC_HOME = SDL_SCANCODE_AC_HOME,
+	ROSE_SCANCODE_AC_BACK = SDL_SCANCODE_AC_BACK,
+	ROSE_SCANCODE_AC_FORWARD = SDL_SCANCODE_AC_FORWARD,
+	ROSE_SCANCODE_AC_STOP = SDL_SCANCODE_AC_STOP,
+	ROSE_SCANCODE_AC_REFRESH = SDL_SCANCODE_AC_REFRESH,
+	ROSE_SCANCODE_AC_BOOKMARKS = SDL_SCANCODE_AC_BOOKMARKS,
+	ROSE_SCANCODE_SOFTLEFT = SDL_SCANCODE_SOFTLEFT,
+	ROSE_SCANCODE_SOFTRIGHT = SDL_SCANCODE_SOFTRIGHT,
+	ROSE_SCANCODE_CALL = SDL_SCANCODE_CALL,
+	ROSE_SCANCODE_ENDCALL = SDL_SCANCODE_ENDCALL,
+	ROSE_SCANCODE_RESERVED = SDL_SCANCODE_RESERVED,
+	ROSE_SCANCODE_COUNT = SDL_SCANCODE_COUNT,
+} ROSE_Scancode;
+
+typedef struct ROSE_ScreenInfo {
+	uint32_t width;  // read only
+	uint32_t height; // read only
+	bool minimized;  // read only
+} ROSE_ScreenInfo;
+
+typedef struct ROSE_MouseInfo {
+	float xpos;   // read only
+	float ypos;   // read only
+	float xvel;   // read only
+	float yvel;   // read only
+	float scroll; // read only
+} ROSE_MouseInfo;
+
+#define ROSE_GLOBAL(type, var) \
+type var = { 0 };
+
+#ifdef ROSE_EXTERN
+#undef ROSE_GLOBAL
+#define ROSE_GLOBAL(type, var) \
+extern type var;
+#endif
+
+ROSE_GLOBAL(ROSE_ScreenInfo, rose_screen)
+ROSE_GLOBAL(ROSE_MouseInfo, rose_mouse)
+
+ROSE_GLOBAL(SDL_Window*, rose__window)
+ROSE_GLOBAL(SDL_GPUDevice*, rose__device)
+ROSE_GLOBAL(SDL_GPUSampler*, rose__sampler)
+ROSE_GLOBAL(SDL_GPUTexture*, rose__ascii_texture)
+ROSE_GLOBAL(SDL_GPUTexture*, rose__dummy_texture)
+
+ROSE_GLOBAL(SDL_GPUBuffer*, rose__sprite_quad_buffer)
+ROSE_GLOBAL(SDL_GPUGraphicsPipeline*, rose__sprite_pipeline)
+ROSE_GLOBAL(SDL_GPUGraphicsPipeline*, rose__triangles_pipeline)
+ROSE_GLOBAL(SDL_GPUGraphicsPipeline*, rose__points_pipeline)
+ROSE_GLOBAL(SDL_GPUGraphicsPipeline*, rose__lines_pipeline)
+
+ROSE_GLOBAL(SDL_GPURenderPass*, rose__render_pass)
+ROSE_GLOBAL(SDL_GPUTexture*, rose__swapchain_texture)
+ROSE_GLOBAL(SDL_GPUCommandBuffer*, rose__command_buffer)
+ROSE_GLOBAL(SDL_GPUCommandBuffer*, rose__copy_command_buffer)
+ROSE_GLOBAL(SDL_GPUCopyPass*, rose__copy_pass)
+ROSE_GLOBAL(SDL_GPUGraphicsPipeline*, rose__bound_pipeline)
+ROSE_GLOBAL(SDL_GPUBuffer*, rose__bound_vertex_buffer)
+ROSE_GLOBAL(SDL_GPUTexture*, rose__bound_texture)
+ROSE_GLOBAL(SDL_GPUPresentMode, rose__present_mode)
+ROSE_GLOBAL(bool, rose__present_mode_dirty)
+
+ROSE_GLOBAL(float, rose__saved_mouse_px)
+ROSE_GLOBAL(float, rose__saved_mouse_py)
+ROSE_GLOBAL(uint32_t, rose__curr_mouse_state)
+ROSE_GLOBAL(uint32_t, rose__prev_mouse_state)
+ROSE_GLOBAL(bool, rose__curr_keyboard_state[SDL_SCANCODE_COUNT])
+ROSE_GLOBAL(bool, rose__prev_keyboard_state[SDL_SCANCODE_COUNT])
+
+#define ROSE_ASCII_WIDTH 7
+#define ROSE_ASCII_HEIGHT 11
+#define ROSE_ASCII_GLYPHS 95
+#define ROSE__TEXTURE_PADDING 16u
+
+typedef struct { float   r, g, b, a; } ROSE_Color;
+typedef struct { uint8_t r, g, b, a; } ROSE_RGBA;
+
+#define ROSE_COLOR(r, g, b, a) \
+((ROSE_Color){                 \
+(float)(r) / 255.0f,           \
+(float)(g) / 255.0f,           \
+(float)(b) / 255.0f,           \
+(float)(a) / 255.0f })
+
+#define ROSE_COLOR_WHITE  ROSE_COLOR(255, 255, 255, 255)
+#define ROSE_COLOR_BLACK  ROSE_COLOR(  0,   0,   0, 255)
+#define ROSE_COLOR_RED    ROSE_COLOR(255,   0,   0, 255)
+#define ROSE_COLOR_GREEN  ROSE_COLOR(  0, 255,   0, 255)
+#define ROSE_COLOR_BLUE   ROSE_COLOR(  0,   0, 255, 255)
+#define ROSE_COLOR_CYAN   ROSE_COLOR(  0, 255, 255, 255)
+#define ROSE_COLOR_PURPLE ROSE_COLOR(255,   0, 255, 255)
+#define ROSE_COLOR_YELLOW ROSE_COLOR(255, 255,   0, 255)
+#define ROSE_COLOR_TRANS  ROSE_COLOR(255, 255, 255,   0)
+
+typedef struct ROSE_VertexSprite {
+	float position[2];
+	float texcoords[2];
+} ROSE_VertexSprite;
+
+typedef struct ROSE_Vertex2D {
+	float position[2];
+} ROSE_Vertex2D;
+
+typedef struct ROSE_Perlin {
+	uint32_t seed;
+	uint32_t divisions;
+	uint32_t layers;
+	float attenuation;
+	float division_growth;
+	uint32_t _width;
+	uint32_t _height;
+	float* _noise;
+} ROSE_Perlin;
+
+typedef struct ROSE_Image {
+	uint32_t _width;
+	uint32_t _height;
+	uint8_t* _pixels;
+} ROSE_Image;
+
+typedef struct ROSE_Text {
+	uint32_t scale;
+	int32_t xpos;
+	int32_t ypos;
+	ROSE_Color color;
+	uint32_t _num_characters;
+	uint32_t _num_vertices;
+	uint32_t _character_capacity;
+	char* _string;
+	SDL_GPUBuffer* _vertex_buffer;
+	SDL_GPUTransferBuffer* _transfer_buffer;
+} ROSE_Text;
+
+typedef struct ROSE_Sprite {
+	uint32_t scale;
+	int32_t xpos;
+	int32_t ypos;
+	uint32_t _width;
+	uint32_t _height;
+	ROSE_Color color;
+	SDL_GPUTexture* _texture;
+	SDL_GPUTransferBuffer* _transfer_buffer;
+} ROSE_Sprite;
+
+typedef struct ROSE_Button {
+	uint32_t scale;
+	int32_t xpos;
+	int32_t ypos;
+	uint32_t width;
+	uint32_t _width;
+	bool _curr_pressed;
+	bool _prev_pressed;
+	ROSE_Sprite _sprite_normal;
+	ROSE_Sprite _sprite_pressed;
+	ROSE_Text _text;
+} ROSE_Button;
+
+typedef struct ROSE_Slider {
+	uint32_t scale;
+	int32_t xpos;
+	int32_t ypos;
+	uint32_t width;
+	float* subject;
+	float min;
+	float max;
+	uint32_t _width;
+	bool _curr_aquired;
+	bool _prev_aquired;
+	ROSE_Sprite _sprite_handle_normal;
+	ROSE_Sprite _sprite_handle_pressed;
+	ROSE_Sprite _sprite_bar;
+} ROSE_Slider;
+
+typedef enum ROSE_SHAPE {
+	ROSE_TRIANGLES,
+	ROSE_LINES,
+	ROSE_POINTS,
+} ROSE_SHAPE;
+
+typedef struct ROSE_Mesh {
+	ROSE_SHAPE shape;
+	float scale;
+	float xpos;
+	float ypos;
+	float diameter;
+	ROSE_Color color;
+	uint32_t _num_vertices;
+	uint32_t _vertex_capacity;
+	SDL_GPUBuffer* _vertex_buffer;
+	SDL_GPUTransferBuffer* _transfer_buffer;
+} ROSE_Mesh;
+
+void ROSE_Init(const char* title, uint32_t screen_width, uint32_t screen_height);
+void ROSE_Quit(void);
+
+void ROSE_WindowVSync(bool vsync);
+bool ROSE_WindowPollEvents(void);
+void ROSE_WindowBeginFrame(ROSE_Color clear_color);
+void ROSE_WindowEndFrame(void);
+double ROSE_WindowDeltaTime(void);
+
+bool ROSE_MousePressing(uint32_t mouse_button);
+bool ROSE_MousePressed(uint32_t mouse_button);
+bool ROSE_MouseReleased(uint32_t mouse_button);
+void ROSE_MouseHide(void);
+void ROSE_MouseReveal(void);
+
+bool ROSE_KeyboardPressing(ROSE_Scancode scancode);
+bool ROSE_KeyboardPressed(ROSE_Scancode scancode);
+bool ROSE_KeyboardReleased(ROSE_Scancode scancode);
+ROSE_Scancode ROSE_KeyboardCurrPressing(void);
+ROSE_Scancode ROSE_KeyboardLastPressed(void);
+ROSE_Scancode ROSE_KeyboardLastReleased(void);
+
+ROSE_Perlin ROSE_PerlinCreate(uint32_t width, uint32_t height);
+void        ROSE_PerlinDestroy(ROSE_Perlin* perlin);
+void        ROSE_PerlinGenerate(ROSE_Perlin* perlin);
+float       ROSE_PerlinGetIntensity(ROSE_Perlin* perlin, uint32_t xpos, uint32_t ypos);
+void        ROSE_PerlinSetIntensity(ROSE_Perlin* perlin, uint32_t xpos, uint32_t ypos, float intensity);
+void        ROSE__PerlinLayer(float* intensities, uint32_t width, uint32_t height, float divisions, float amplitude);
+
+ROSE_Image  ROSE_ImageCreate(uint32_t width, uint32_t height);
+ROSE_Image  ROSE_ImageCreateFromPerlin(ROSE_Perlin* perlin);
+ROSE_Image  ROSE_ImageLoadFromFile(const char* path);
+void        ROSE_ImageDestroy(ROSE_Image* image);
+void        ROSE_ImageSavePNG(ROSE_Image* image, const char* path);
+void        ROSE_ImageResize(ROSE_Image* image, uint32_t width, uint32_t height);
+void        ROSE_ImageFillColor(ROSE_Image* image, ROSE_Color color);
+void        ROSE_ImageFillRGBA(ROSE_Image* image, ROSE_RGBA color);
+ROSE_Color  ROSE_ImageGetPixelColor(ROSE_Image* image, uint32_t xpos, uint32_t ypos);
+ROSE_RGBA   ROSE_ImageGetPixelRGBA(ROSE_Image* image, uint32_t xpos, uint32_t ypos);
+void        ROSE_ImageSetPixelColor(ROSE_Image* image, uint32_t xpos, uint32_t ypos, ROSE_Color color);
+void        ROSE_ImageSetPixelRGBA(ROSE_Image* image, uint32_t xpos, uint32_t ypos, ROSE_RGBA color);
+
+ROSE_Text   ROSE_TextCreate(const char* format, ...);
+ROSE_Text   ROSE_TextCreateEmpty(void);
+void        ROSE_TextDestroy(ROSE_Text* text);
+void        ROSE_TextUpdateString(ROSE_Text* text, const char* format, ...);
+void        ROSE_TextDraw(ROSE_Text* text);
+void        ROSE__TextWriteCharactersToVertices(ROSE_VertexSprite* vertices, const char* string, uint32_t num_characters);
+void        ROSE__TextReserveCharacterCapacity(ROSE_Text* text, uint32_t num_characters);
+
+ROSE_Sprite ROSE_SpriteCreate(ROSE_Image* image);
+ROSE_Sprite ROSE_SpriteCreateEmpty(uint32_t width, uint32_t height);
+ROSE_Sprite ROSE_SpriteLoadFromFile(const char* path);
+void        ROSE_SpriteDestroy(ROSE_Sprite* sprite);
+void        ROSE_SpriteUpdateTexture(ROSE_Sprite* sprite, ROSE_Image* image);
+void        ROSE_SpriteDraw(ROSE_Sprite* sprite);
+ROSE_Sprite ROSE_SpriteCreateGUIBox(uint32_t width, uint32_t height, bool normal);
+
+ROSE_Button ROSE_ButtonCreate(const char* string);
+ROSE_Button ROSE_ButtonCreateEmpty(void);
+void        ROSE_ButtonDestroy(ROSE_Button* button);
+void        ROSE_ButtonUpdateString(ROSE_Button* button, const char* string);
+void        ROSE_ButtonDraw(ROSE_Button* button);
+bool        ROSE_ButtonPressed(ROSE_Button* button);
+bool        ROSE_ButtonReleased(ROSE_Button* button);
+bool        ROSE_ButtonPressing(ROSE_Button* button);
+void        ROSE__ButtonUpdate(ROSE_Button* button);
+
+ROSE_Slider ROSE_SliderCreate(void);
+void        ROSE_SliderDestroy(ROSE_Slider* slider);
+bool        ROSE_SliderPressed(ROSE_Slider* slider);
+bool        ROSE_SliderReleased(ROSE_Slider* slider);
+bool        ROSE_SliderPressing(ROSE_Slider* slider);
+void        ROSE_SliderDraw(ROSE_Slider* slider);
+
+ROSE_Mesh   ROSE_MeshCreate(ROSE_Vertex2D* vertices, uint32_t num_vertices);
+ROSE_Mesh   ROSE_MeshCreateEmpty(void);
+void        ROSE_MeshUpdateVertices(ROSE_Mesh* mesh, ROSE_Vertex2D* vertices, uint32_t num_vertices);
+void        ROSE_MeshDestroy(ROSE_Mesh* mesh);
+void        ROSE_MeshDraw(ROSE_Mesh* mesh);
+void        ROSE__MeshReserveVertexCapacity(ROSE_Mesh* mesh, uint32_t num_vertices);
+
+SDL_GPUSampler*          ROSE__SDLCreateSampler(void);
+uint32_t                 ROSE__SDLPadTextureSize(uint32_t size);
+void                     ROSE__SDLTexCoordScale(uint32_t width, uint32_t height, float scale[2]);
+SDL_GPUTexture*          ROSE__SDLCreateTexture(ROSE_Image* image);
+void                     ROSE__SDLUploadImageToTexture(SDL_GPUTexture* texture, SDL_GPUTransferBuffer** transfer_buffer, ROSE_Image* image);
+SDL_GPUBuffer*           ROSE__SDLCreateVertexBuffer(void* vertices, uint32_t num_vertices, uint32_t vertex_size);
+SDL_GPUCopyPass*         ROSE__SDLAcquireCopyPass(void);
+void                     ROSE__SDLSubmitCopyPass(void);
+void                     ROSE__SDLBindGraphicsPipeline(SDL_GPUGraphicsPipeline* pipeline);
+void                     ROSE__SDLBindVertexBuffer(SDL_GPUBuffer* vertex_buffer);
+void                     ROSE__SDLBindTexture(SDL_GPUTexture* texture);
+SDL_GPUShader*           ROSE__SDLLoadShader(const char* path, SDL_GPUShaderStage stage, uint32_t uniforms, uint32_t samplers);
+SDL_GPUGraphicsPipeline* ROSE__SDLCreateGraphicsPipeline(const char* vert, const char* frag, uint32_t samplers, SDL_GPUVertexInputState input, SDL_GPUPrimitiveType primitive);
+SDL_GPUGraphicsPipeline* ROSE__SDLCreateGraphicsPipelineSprite(void);
+SDL_GPUGraphicsPipeline* ROSE__SDLCreateGraphicsPipelineTriangles(void);
+SDL_GPUGraphicsPipeline* ROSE__SDLCreateGraphicsPipelinePoints(void);
+SDL_GPUGraphicsPipeline* ROSE__SDLCreateGraphicsPipelineLines(void);
+
+#endif /* ROSE_ROSE_HEADER_GUARD */
+
