@@ -15,11 +15,6 @@ typedef int16_t Int16;
 typedef int32_t Int32;
 typedef int64_t Int64;
 
-#define COLOR_RED_CHANNEL()
-#define COLOR_GREEN_CHANNEL()
-#define COLOR_BLUE_CHANNEL()
-#define COLOR_ALPHA_CHANNEL()
-
 /* 
  * 
  * caller is responsible for freeing memory allocated to image_result.
@@ -32,10 +27,6 @@ typedef int64_t Int64;
  *  Most Sig bit       1 byte         Least Sig Bit
  * 
  * Each channel is, of course, 0 - 255
- * 
- * It should be possible to cast one of these pixels (uInt32) to
- * a struct that looks like this:
- * typedef struct RGBA { uInt8 r, g, b, a; }
  * 
  * Memory Layout:
  * 
@@ -92,6 +83,13 @@ typedef int64_t Int64;
  * not necessarily production-grade for every possible image type (even if they're technically valid).
  * 
  * Don't use any external libraries, except for the C standard library (libc).
+ * For reference, the following libc headers are already included by rose.h (but you may add any number of additional libc libraries at the top of main.c as needed)
+ * #include <stdio.h>
+ * #include <stdlib.h>
+ * #include <stdint.h>
+ * #include <stdbool.h>
+ * #include <float.h>
+ * #include <assert.h>
  * 
  * if you need/want to add static helper functions, macro definitions, enums, and/or structs (only to be used/called by 'png_decoder', of course),
  * you may do so only in the region below.
@@ -99,7 +97,9 @@ typedef int64_t Int64;
  * A (skeleton) that converts an integer return status into a (slightly) more helpful diagnostic message is already provided inside
  * of your allowed helper area. This function should be filled out - but doesnt need to be super verbose - exercise reasonable judgement.
  * 
- * Dont edit any code that isnt inside <HELPER BEGIN> ... <HELPER END> or inside the body of png_decoder() { ... }
+ * Pretty please dont edit any code that isnt inside <HELPER BEGIN> ... <HELPER END> or inside the body of png_decoder() { ... }
+ * 
+ * Thanks! And good luck!
  * 
  **/
 
@@ -144,7 +144,7 @@ int main(void)
 	 * 
 	 * Below, here in 'int main(void)', I've set up a simple test bench.
 	 * All it does is let me compare the two images against eachother visually.
-	 * Both are rendered as ROSE_Sprites, but one if loaded from stbi_image and the other is loaded from png_decoder.
+	 * Both are rendered as ROSE_Sprites, but one is loaded from stbi_image and the other is loaded from png_decoder.
 	 * 
 	 */
 
@@ -154,7 +154,7 @@ int main(void)
 	int return_status = png_decoder(path, &pixels, &width, &height);
 
 	if (return_status != 0) {
-		fprintf(stderr, "png_decoder() failed! (error: %d) message: %s\n", png_error(return_status));
+		fprintf(stderr, "png_decoder() failed! (error: %d) message: %s\n", return_status, png_error(return_status));
 		exit(EXIT_FAILURE);
 	}
 
